@@ -1,4 +1,4 @@
-//Read input file
+//Read input file and to sort data, converting to json 
 var XLSX = require('xlsx');
 var workbook = XLSX.readFile('Input.xlsx');
 var sheet_name_list = workbook.SheetNames;
@@ -7,10 +7,10 @@ var data = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 //sort by Genre ascending and then by Critic score descending
 function predicateBy(prop1, prop2) {
     return function (a, b) {
-        if (a[prop1] > b[prop1]) 
+        if (a[prop1] > b[prop1])
             return 1;
-        else if (a[prop1] < b[prop1]) 
-            return -1;        
+        else if (a[prop1] < b[prop1])
+            return -1;
         else if (b[prop2] > a[prop2])
             return 1;
         else if (b[prop2] < a[prop2])
@@ -23,7 +23,7 @@ data.sort(predicateBy("Genre", "Critic Score"));
 
 //write the output to new file called "out"
 var book = XLSX.utils.book_new();
-var worksheet = XLSX.utils.json_to_sheet(data);
+var worksheet = XLSX.utils.json_to_sheet(data); //converting the sorted json back to sheet
 XLSX.utils.book_append_sheet(book, worksheet, 'Sheet2');
 XLSX.writeFile(book, 'out.xlsx');
 
@@ -58,16 +58,25 @@ workbook.xlsx.readFile('out.xlsx')
                     right: { style: 'thin', color: { argb: '17202A' } }
                 }
             };
+
+
         }
         row.commit();
 
-        //to set the column header values
-        worksheet.getColumn(1).header = "SNO";
-        worksheet.getColumn(2).header = "Album Name";
-        worksheet.getColumn(3).header = "Genre";
-        worksheet.getColumn(4).header = "Artist";
-        worksheet.getColumn(5).header = "Release Date";
-        worksheet.getColumn(6).header = "Critic Score";
+        //align right if the cell value is a number
+        for (i = 2; i <= worksheet.rowCount; i++) {
+            for (j = 1; j <= worksheet.getRow(i).cellCount; j++) {
+                var reg = new RegExp('^[0-9]+$');
+                if (reg.test(worksheet.getRow(i).getCell(j).value) == true) {
+                    worksheet.getRow(i).getCell(j).style = {
+                        alignment:
+                        {
+                            horizontal: 'right'
+                        },
+                    }
+                }
+            }
+        }
 
         //update the "out" file with header styling changes
         return workbook.xlsx.writeFile('out.xlsx');

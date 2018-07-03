@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "exceljs": "^1.5.1",
-    "npm": "^6.1.0"
+    "npm": "^6.1.0",
+    "xlsx": "^0.13.1"
   }
 }

@@ -34,7 +34,6 @@ var workbook = new Excel.Workbook();
 workbook.xlsx.readFile('out.xlsx')
     .then(function () {
         var worksheet = workbook.getWorksheet('Sheet2');
-
         var row = worksheet.getRow(1); //Fetch header row
         for (i = 1; i <= row.cellCount; i++) {
             //set header style(background, bold font, center aligned)
@@ -44,7 +43,7 @@ workbook.xlsx.readFile('out.xlsx')
                     type: 'pattern',
                     pattern: 'mediumGray',
                     bgColor: { argb: 'F1C40F' },
-                    fgColor: { argb: 'F1C40F' }
+                    fgColor: { argb: 'F1C40F' },
                 },
                 font:
                 {
@@ -52,11 +51,11 @@ workbook.xlsx.readFile('out.xlsx')
                 },
                 alignment:
                 {
-                    horizontal: 'center'
+                    horizontal: 'center',
                 },
                 border: {
                     right: { style: 'thin', color: { argb: '17202A' } }
-                }
+                },
             };
 
 
@@ -74,9 +73,21 @@ workbook.xlsx.readFile('out.xlsx')
                             horizontal: 'right'
                         },
                     }
+                    //converting text to number to remove green triangles in excel sheet
+                    worksheet.getRow(i).getCell(j).value = Number(worksheet.getRow(i).getCell(j).value);
                 }
             }
         }
+
+        //setting up header width for each column
+        worksheet.columns = [
+            { header: 'SNO', key: 'sno', width: 10 },
+            { header: 'Album Name', key: 'album_name', width: 32 },
+            { header: 'Genre', key: 'genre', width: 10 },
+            { header: 'Artist', key: 'artist', width: 20 },
+            { header: 'Release Date', key: 'release_date', width: 15 },
+            { header: 'Critic Score', key: 'critic_score', width: 10 }
+        ];
 
         //update the "out" file with header styling changes
         return workbook.xlsx.writeFile('out.xlsx');

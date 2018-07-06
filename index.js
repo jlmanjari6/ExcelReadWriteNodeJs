@@ -21,22 +21,44 @@ function predicateBy(prop1, prop2) {
 }
 data.sort(predicateBy("Genre", "Critic Score"));
 
+//function that generates the random color
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+//to assign distinct color to each Genre
+function getDistinctValues() {
+    var distinctGenres = [];
+    for (var i = 0; i < data.length; i++) {
+        if (!distinctGenres.hasOwnProperty(data[i]["Genre"])) {
+            distinctGenres[data[i]["Genre"]] = getRandomColor();
+        }
+    }
+    return distinctGenres;
+}
+
 //write the output to new file called "out"
 var book = XLSX.utils.book_new();
 var worksheet = XLSX.utils.json_to_sheet(data); //converting the sorted json back to sheet
 XLSX.utils.book_append_sheet(book, worksheet, 'Sheet2');
-XLSX.writeFile(book, 'out.xlsx');
+XLSX.writeFile(book, 'Output.xlsx');
 
 //reading the newly generated "out" file
 var Excel = require('exceljs');
 var workbook = new Excel.Workbook();
 
-workbook.xlsx.readFile('out.xlsx')
+workbook.xlsx.readFile('Output.xlsx')
     .then(function () {
         var worksheet = workbook.getWorksheet('Sheet2');
-        var row = worksheet.getRow(1); //Fetch header row
+
+        //to fetch the header row and set the header style
+        var row = worksheet.getRow(1); 
         for (i = 1; i <= row.cellCount; i++) {
-            //set header style(background, bold font, center aligned)
             row.getCell(i).style = {
                 fill:
                 {
@@ -79,6 +101,33 @@ workbook.xlsx.readFile('out.xlsx')
             }
         }
 
+        // to get the distinct color codes for different Genre types and color the corresponding rows 
+        var arr = getDistinctValues();
+        for (i = 2; i <= worksheet.rowCount; i++) {
+            for (j = 1; j <= worksheet.getRow(i).cellCount; j++) {
+                var cellValue = worksheet.getRow(i).getCell(j).value;
+                if (arr.hasOwnProperty(cellValue)) {
+                    var fillColor = arr[cellValue];
+                    var row = worksheet.getRow(i);
+                    for (k = 1; k <= row.cellCount; k++) {
+                        row.getCell(k).style = {
+                            fill:
+                            {
+                                type: 'pattern',
+                                pattern: 'mediumGray',
+                                bgColor: { argb: fillColor },
+                                fgColor: { argb: fillColor },
+                            },
+                            border: {
+                                right: { style: 'thin', color: { argb: '17202A' } },
+                                bottom: { style: 'thin', color: { argb: '17202A' } }
+                            },
+                        }
+                    }
+                }
+            }
+        }
+
         //setting up header width for each column
         worksheet.columns = [
             { header: 'SNO', key: 'sno', width: 10 },
@@ -90,6 +139,6 @@ workbook.xlsx.readFile('out.xlsx')
         ];
 
         //update the "out" file with header styling changes
-        return workbook.xlsx.writeFile('out.xlsx');
+        return workbook.xlsx.writeFile('Output.xlsx');
     });
 

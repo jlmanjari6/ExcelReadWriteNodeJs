@@ -1,4 +1,4 @@
-# ExcelReadWriteNodeJs
+﻿# ExcelReadWriteNodeJs
 -> Read and write excel files using exceljs and xlsx.
 
 //Solves the word document attached
@@ -14,5 +14,8 @@ o	If a cell contains number, it should be right aligned.
 o	If a cell contains text, it should be left aligned.
 o	Data should be in sorted order of Genre and then in descending order of Credit Score.
 o	Each Genre’s rows should have different background color
+
+
+-> npm install exceljs, xlsx
 
 
